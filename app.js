@@ -74,6 +74,7 @@ app.get("/shows/get/:id", function(req, res) {
             res.status(500).send(err);
         }
         //if no match found
+        console.log(data);
         if (data != null) {
             data = JSON.parse(data);
             var response = {
@@ -96,6 +97,13 @@ app.get("/shows/get/:id", function(req, res) {
                     return res.status(500).json(err);
                 }
                 else {
+                    if (show === null) {
+                        var response = {
+                            status: 'success',
+                            message: 'Not present in the database'
+                        }
+                        return res.status(200).json(response);
+                    }
                     var data = {
                         name: show.name,
                         id: show._id
@@ -115,7 +123,7 @@ app.get("/shows/get/:id", function(req, res) {
     });
 });
 
-app.post("/shows/update/:id", function(req, res) {
+app.put("/shows/update/:id", function(req, res) {
     Show.findByIdAndUpdate(req.params.id, {
         name: req.body.name
     }, function(err, show) {
@@ -124,17 +132,48 @@ app.post("/shows/update/:id", function(req, res) {
             return res.status(500).json(err);
         }
         else {
+            if (show === null) {
+                var response = {
+                    status: 'success',
+                    message: 'Not present in the database'
+                }
+                return res.status(200).json(response);
+            }
             var data = {
                 name: req.body.name,
-                id: show._id
+                id: show.id
             }
             var response = {
                 status: 'success',
                 message: 'Show update in the database',
                 data: data
             }
-            redis_client.del(show._id.toString());
+            redis_client.del(show.id.toString());
             return res.status(200).json(response);
+        }
+    });
+});
+
+app.delete("/shows/delete/:id", function(req, res) {
+    Show.findByIdAndDelete(req.params.id, function(err, response) {
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+        else {
+            if (response === null) {
+                var response = {
+                    status: 'success',
+                    message: 'Not present in the database'
+                }
+                return res.status(200).json(response);
+            }
+            var responseData = {
+                status: 'success',
+                message: 'Show deleted in the Database'
+            }
+            redis_client.del(response._id.toString());
+            return res.status(200).json(responseData); 
         }
     });
 });
