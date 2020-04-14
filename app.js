@@ -33,8 +33,14 @@ mongoose.connect("mongodb+srv://" + process.env.DBUSERNAME + ":" + process.env.D
 var showSchema = new mongoose.Schema({
     name: { type: String, default: 'New Show' }
 });
+var articleSchema = new mongoose.Schema({
+    title: { type: String, default: 'New Article' },
+    content: { type: String, default: 'New Content' },
+    jobId: { type: Number }
+});
 
 var Show = new mongoose.model("Show", showSchema);
+var Article = new mongoose.model("Article", articleSchema);
 
 
 // ===========================================================
@@ -178,9 +184,67 @@ app.delete("/shows/delete/:id", function(req, res) {
     });
 });
 
+app.post("/shows/submit", function (req, res) {
+    var jobId = Math.floor(Math.random() * 1000000000);
+    console.log(jobId);
+    var re = async function() {
+        setTimeout(async function() {
+            await Article.create({
+                title: req.body.title,
+                content: req.body.content,
+                jobId: jobId
+            })
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+            console.log("Async methods"); 
+        }, 20000);
+    };
+    re();
+    var response = {
+        status: 'success',
+        message: 'The job is started. Query the jobId for the status',
+        jobId: jobId
+    }
+    return res.status(200).json(response);
+});
+
+app.get("/shows/results/:jobId", async function (req, res) {
+    await Article.find({jobId: req.params.jobId})
+        .then(function(response) {
+            console.log(response);
+            if (response.length === 0) {
+                var responseData = {
+                    status: 'success',
+                    message: 'The job is now pending ',
+                    jobId: req.params.jobId
+                }
+                return res.status(200).json(responseData);
+            }
+            else {
+                var responseData = {
+                    status: 'success',
+                    message: 'The job is finished ',
+                    jobId: req.params.jobId,
+                    data: {
+                        title: response[0].title,
+                        content: response[0].content
+                    }
+                }
+                return res.status(200).json(responseData);
+            }
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+});
+
 
 var port = process.env.PORT || 8090;
 
-app.listen(8090, process.env.IP, function (req, res) {
+app.listen(8000, process.env.IP, function (req, res) {
     console.log("The Backend Service has started!");
 });
