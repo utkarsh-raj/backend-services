@@ -115,6 +115,30 @@ app.get("/shows/get/:id", function(req, res) {
     });
 });
 
+app.post("/shows/update/:id", function(req, res) {
+    Show.findByIdAndUpdate(req.params.id, {
+        name: req.body.name
+    }, function(err, show) {
+        if (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+        else {
+            var data = {
+                name: req.body.name,
+                id: show._id
+            }
+            var response = {
+                status: 'success',
+                message: 'Show update in the database',
+                data: data
+            }
+            redis_client.del(show._id.toString());
+            return res.status(200).json(response);
+        }
+    });
+});
+
 
 var port = process.env.PORT || 8090;
 
