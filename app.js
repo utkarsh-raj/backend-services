@@ -76,30 +76,7 @@ app.post("/shows/post", function (req, res) {
     });
 });
 
-app.get("/shows/get", function(req, res) {
-    Show.find({}, function(err, shows) {
-        if (err) {
-            console.log(err);
-            res.status(500).send(err);
-        }
-        else {     
-            var data = [];
-            shows.forEach(function(item, index) {
-                data.push({
-                    name: item.name
-                });
-            });            
-            var response = {
-                status: 'success',
-                message: 'All shows retrieved from the database',
-                data: data
-            }
-            return res.status(200).json(response);
-        } 
-    });
-});
-
-app.get("/shows/get/:id", function(req, res) {
+app.get("/shows/get/:id", function (req, res) {
     redis_client.get(req.params.id, (err, data) => {
         if (err) {
             console.log(err);
@@ -114,7 +91,7 @@ app.get("/shows/get/:id", function(req, res) {
                 message: 'Show retrieved from the cache',
                 data: {
                     name: data.name,
-                    id: data.id                
+                    id: data.id
                 }
             }
             redis_client.set(data.id, JSON.stringify(data), 'EX', 3000, function (err, reply) {
@@ -139,7 +116,7 @@ app.get("/shows/get/:id", function(req, res) {
                     var data = {
                         name: show.name,
                         id: show._id
-                    } 
+                    }
                     var response = {
                         status: 'success',
                         message: 'Show retrieved from the database',
@@ -152,6 +129,30 @@ app.get("/shows/get/:id", function(req, res) {
                 }
             });
         }
+    });
+});
+
+app.get("/shows/get", function(req, res) {
+    Show.find({}, function(err, shows) {
+        if (err) {
+            console.log(err);
+            res.status(500).send(err);
+        }
+        else {     
+            var data = [];
+            shows.forEach(function(item, index) {
+                data.push({
+                    name: item.name,
+                    id: item._id
+                });
+            });            
+            var response = {
+                status: 'success',
+                message: 'All shows retrieved from the database',
+                data: data
+            }
+            return res.status(200).json(response);
+        } 
     });
 });
 
@@ -210,7 +211,7 @@ app.delete("/shows/delete/:id", function(req, res) {
     });
 });
 
-app.post("/shows/submit", function (req, res) {
+app.post("/articles/submit", function (req, res) {
     var jobId = Math.floor(Math.random() * 1000000000);
     console.log(jobId);
     var re = async function() {
@@ -238,7 +239,7 @@ app.post("/shows/submit", function (req, res) {
     return res.status(200).json(response);
 });
 
-app.get("/shows/results/:jobId", async function (req, res) {
+app.get("/articles/results/:jobId", async function (req, res) {
     await Article.find({jobId: req.params.jobId})
         .then(function(response) {
             console.log(response);
