@@ -16,7 +16,7 @@ require('dotenv').config();
 sentry.init({ dsn: 'https://591e51d9e0614b46a51c45cb9b8f1122@o378036.ingest.sentry.io/5200868' });
 
 var app = express();
-var redis_client = redis.createClient(process.env.PORT || 6379);
+var redis_client = redis.createClient("redis://127.0.0.1:6379" || process.env.PORT);
 
 redis_client.on('connect', function () {
     console.log('connected');
