@@ -5,6 +5,7 @@ var express = require("express"),
     mongoose = require("mongoose"),
     queryString = require("querystring"),
     request = require("request"),
+    sentry = require("@sentry/node"),
     redis = require("redis"),
     axios = require("axios"),
     timeout = require("connect-timeout");
@@ -12,14 +13,16 @@ var express = require("express"),
 // Application setup
 
 require('dotenv').config();
+sentry.init({ dsn: 'https://591e51d9e0614b46a51c45cb9b8f1122@o378036.ingest.sentry.io/5200868' });
 
 var app = express();
-var redis_client = redis.createClient(process.env.PORT || 6379);
+var redis_client = redis.createClient(6379 || process.env.PORT);
 
 redis_client.on('connect', function () {
     console.log('connected');
 });
 
+app.use(sentry.Handlers.requestHandler());
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 redis_client.auth(process.env.REDISPASSWORD);
@@ -65,11 +68,34 @@ app.post("/shows/post", function (req, res) {
                 message: ' Saved into the database',
                 data: data
             }
-            redis_client.set(show._id.toString(), JSON.stringify(data), 'EX', 10, function(err, reply) {
+            redis_client.set(show._id.toString(), JSON.stringify(data), 'EX', 3000, function(err, reply) {
                 console.log(reply);
             });
             return res.status(200).json(response);
         }
+    });
+});
+
+app.get("/shows/get", function(req, res) {
+    Show.find({}, function(err, shows) {
+        if (err) {
+            console.log(err);
+            res.status(500).send(err);
+        }
+        else {     
+            var data = [];
+            shows.forEach(function(item, index) {
+                data.push({
+                    name: item.name
+                });
+            });            
+            var response = {
+                status: 'success',
+                message: 'All shows retrieved from the database',
+                data: data
+            }
+            return res.status(200).json(response);
+        } 
     });
 });
 
@@ -91,7 +117,7 @@ app.get("/shows/get/:id", function(req, res) {
                     id: data.id                
                 }
             }
-            redis_client.set(data.id, JSON.stringify(data), 'EX', 10, function (err, reply) {
+            redis_client.set(data.id, JSON.stringify(data), 'EX', 3000, function (err, reply) {
                 console.log(reply);
             });
 
@@ -119,7 +145,7 @@ app.get("/shows/get/:id", function(req, res) {
                         message: 'Show retrieved from the database',
                         data: data
                     }
-                    redis_client.set(show._id.toString(), JSON.stringify(data), 'EX', 10, function (err, reply) {
+                    redis_client.set(show._id.toString(), JSON.stringify(data), 'EX', 3000, function (err, reply) {
                         console.log(reply);
                     });
                     return res.status(200).json(response);
@@ -242,9 +268,15 @@ app.get("/shows/results/:jobId", async function (req, res) {
         });
 });
 
+app.get('/debug-sentry', function mainHandler(req, res) {
+    throw new Error('My first Sentry error!');
+});
 
-var port = process.env.PORT || 8090;
+app.use(sentry.Handlers.errorHandler());
 
-app.listen(8000, process.env.IP, function (req, res) {
+
+var port = process.env.PORT || 8000;
+
+app.listen(port, process.env.IP, function (req, res) {
     console.log("The Backend Service has started!");
 });

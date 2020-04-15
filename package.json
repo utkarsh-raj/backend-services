@@ -9,15 +9,18 @@
   "author": "Utkarsh Raj Singh",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^5.15.4",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "connect-timeout": "^1.9.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.9.9",
+    "newrelic": "^6.5.0",
     "querystring": "^0.2.0",
     "redis": "^3.0.2",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "sentry": "^0.1.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.3"
