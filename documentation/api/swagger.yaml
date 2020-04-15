@@ -1,0 +1,299 @@
+---
+swagger: "2.0"
+info:
+  description: "A simple backend services API"
+  version: "1.0.0"
+  title: "backend-services"
+host: "virtserver.swaggerhub.com"
+basePath: "/utkarsh-raj/backend-services/1.0.0"
+schemes:
+- "https"
+paths:
+  /shows/get:
+    get:
+      summary: "Get the list of all the shows"
+      operationId: "showsGetGET"
+      parameters: []
+      responses:
+        "200":
+          description: "Success response"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+      x-swagger-router-controller: "Default"
+  /shows/get/{id}:
+    get:
+      summary: "Get the particular show with the id"
+      operationId: "showsGetIdGET"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the show queried"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Success response"
+          schema:
+            $ref: "#/definitions/inline_response_200_1"
+      x-swagger-router-controller: "Default"
+  /shows/post/:
+    post:
+      summary: "Creates a new show ."
+      operationId: "showsPostPOST"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "show"
+        description: "The show to create."
+        required: false
+        schema:
+          $ref: "#/definitions/show"
+      responses:
+        "200":
+          description: "Success response"
+          schema:
+            $ref: "#/definitions/inline_response_200_2"
+      x-swagger-router-controller: "Default"
+  /shows/update/{id}:
+    put:
+      summary: "Updates the existing shows."
+      operationId: "showsUpdateIdPUT"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "show"
+        description: "The show to update."
+        required: false
+        schema:
+          $ref: "#/definitions/show_1"
+      - name: "id"
+        in: "path"
+        description: "The id of the show to be updated "
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Success response"
+          schema:
+            $ref: "#/definitions/inline_response_200_3"
+      x-swagger-router-controller: "Default"
+  /shows/delete/{id}:
+    delete:
+      summary: "Deletes the show."
+      operationId: "showsDeleteIdDELETE"
+      consumes:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the show to be deleted "
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Success response"
+          schema:
+            $ref: "#/definitions/inline_response_200_4"
+      x-swagger-router-controller: "Default"
+  /articles/submit:
+    post:
+      summary: "An async endpoint to submit a new article."
+      operationId: "articlesSubmitPOST"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "title"
+        description: "The article to create"
+        required: false
+        schema:
+          $ref: "#/definitions/title"
+      responses:
+        "200":
+          description: "Success response"
+          schema:
+            $ref: "#/definitions/inline_response_200_5"
+      x-swagger-router-controller: "Default"
+  /articles/results/{id}:
+    get:
+      summary: "An async endpoint to see the status of a submitted job (creation of\
+        \ the article)."
+      operationId: "articlesResultsIdGET"
+      consumes:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The id of the article to be seen "
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Success response"
+          schema:
+            $ref: "#/definitions/inline_response_200_6"
+      x-swagger-router-controller: "Default"
+definitions:
+  show_1:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+  inline_response_200_5:
+    type: "object"
+    properties:
+      status:
+        type: "string"
+        example: "success"
+      message:
+        type: "string"
+        example: "The job is started. Query the jobId for the status"
+      jobId:
+        type: "number"
+        example: 125438783
+    example:
+      jobId: 125438783
+      message: "The job is started. Query the jobId for the status"
+      status: "success"
+  inline_response_200_6:
+    type: "object"
+    properties:
+      status:
+        type: "string"
+        example: "success"
+      message:
+        type: "string"
+        example: "The job is finished"
+      data:
+        type: "object"
+        example:
+          title: "Review of The Witcher"
+          content: "lorem ipsum dolor sit amet"
+        properties: {}
+      jobId:
+        type: "number"
+        example: 125784683
+    example:
+      jobId: 125784683
+      data:
+        title: "Review of The Witcher"
+        content: "lorem ipsum dolor sit amet"
+      message: "The job is finished"
+      status: "success"
+  inline_response_200_1:
+    type: "object"
+    properties:
+      status:
+        type: "string"
+        example: "success"
+      message:
+        type: "string"
+        example: "One particular show retrieved from the database"
+      data:
+        type: "array"
+        example:
+        - name: "Breaking Bad"
+          id: "5e9712ef3cd9ce1744d5a6ec"
+        items: {}
+    example:
+      data:
+      - name: "Breaking Bad"
+        id: "5e9712ef3cd9ce1744d5a6ec"
+      message: "One particular show retrieved from the database"
+      status: "success"
+  show:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+  inline_response_200:
+    type: "object"
+    properties:
+      status:
+        type: "string"
+        example: "success"
+      message:
+        type: "string"
+        example: "All shows retrieved from the database"
+      data:
+        type: "array"
+        example:
+        - name: "Breaking Bad"
+        - name: "The Witcher"
+        items: {}
+    example:
+      data:
+      - name: "Breaking Bad"
+      - name: "The Witcher"
+      message: "All shows retrieved from the database"
+      status: "success"
+  inline_response_200_2:
+    type: "object"
+    properties:
+      status:
+        type: "string"
+        example: "success"
+      message:
+        type: "string"
+        example: "Saved into the database"
+      data:
+        type: "object"
+        example:
+          name: "Money Heist"
+          id: "5e96cea6d96a3813dec086b2"
+        properties: {}
+    example:
+      data:
+        name: "Money Heist"
+        id: "5e96cea6d96a3813dec086b2"
+      message: "Saved into the database"
+      status: "success"
+  inline_response_200_3:
+    type: "object"
+    properties:
+      status:
+        type: "string"
+        example: "success"
+      message:
+        type: "string"
+        example: "Show update in the Database"
+      data:
+        type: "object"
+        example:
+          name: "Money Heist Season 2"
+          id: "5e96cea6d96a3813dec086b2"
+        properties: {}
+    example:
+      data:
+        name: "Money Heist Season 2"
+        id: "5e96cea6d96a3813dec086b2"
+      message: "Show update in the Database"
+      status: "success"
+  inline_response_200_4:
+    type: "object"
+    properties:
+      status:
+        type: "string"
+        example: "success"
+      message:
+        type: "string"
+        example: "Show deleted in the Database"
+    example:
+      message: "Show deleted in the Database"
+      status: "success"
+  title:
+    type: "object"
+    required:
+    - "content"
+    - "title"
+    properties:
+      title:
+        type: "string"
+      content:
+        type: "string"
